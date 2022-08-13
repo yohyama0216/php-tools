@@ -36,7 +36,7 @@ class Converter {
         $roundData = [];
         foreach($matches[0] as $match){
             $round = $this->getStrings($roundPattern,$match);
-            $roundData[$round] = [
+            $roundData[(int)$round] = [
                 'date' => $this->getStrings($datePattern,$match),
                 'numbers' => $this->getStrings($numberPattern,$match),
             ];
