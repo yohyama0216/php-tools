@@ -2,24 +2,45 @@
 
 class Numbers3 {
     private $sourceFile = "../pastResult/numbers3-past-result.json";
+    private $StaticsService;
+
+    public function __construct()
+    {
+        $data = json_decode(file_get_contents($this->sourceFile),true);
+        $this->StaticsService = new StaticsService($data);
+    }
+
+    public function displayStatics()
+    {
+        $this->StaticsService->displayStaticsConsecutiveHit(2); // 0.12 
+        $this->StaticsService->displayStaticsConsecutiveDifferentCharOneNumbers(2); // 0.55
+        $this->StaticsService->displayStaticsRoundsHitWithInPreviousNumbers(1700); // 54.62
+        $this->StaticsService->displayStaticsRoundsHitWithSameNumber(); // 0.81%
+        $this->StaticsService->displayStaticsRoundsHitWithPlusoneNumber(); // 0.81%
+    }
+}
+
+$numbers3 = new Numbers3();
+$numbers3->displayStatics();
+// 3桁の数字が連続 123, 456など
+// 両端の数字が同じ 121など
+// 前回数字と数字が一つだけ同じ 123→145とか
+// 前回数字とひっくり返した数字　123 → 321など
+
+class StaticsService {
     private $data;
     private $totalCount;
     private $showRounds = false;
 
-    public function __construct()
+    public function __construct($data)
     {
-        $this->data = json_decode(file_get_contents($this->sourceFile),true);
-        $this->totalCount = count($this->data);
+        $this->data = $data;
+        $this->totalCount = count($data);
     }
 
     public function getNumbersByRound($round)
     {
         return $this->data[$round];
-    }
-
-    private function getProbabilityPerTotal($roundCount)
-    {
-        return round($roundCount / $this->totalCount * 100, 2) ."%";
     }
 
     public function getRoundListByNumbers($numbers)
@@ -31,6 +52,11 @@ class Numbers3 {
             }
         }
         return $result;
+    }
+
+    private function getProbabilityPerTotal($roundCount)
+    {
+        return round($roundCount / $this->totalCount * 100, 2) ."%";
     }
 
     /*
@@ -78,7 +104,7 @@ class Numbers3 {
                 echo $round."回".PHP_EOL;
             }
         }
-        echo "全".$this->totalCount."中、".$this->totalCount."回 : ".$this->getProbabilityPerTotal(count($rounds));
+        echo "全".$this->totalCount."中、".count($rounds)."回 : ".$this->getProbabilityPerTotal(count($rounds));
         echo "-----------".PHP_EOL;
     }
 
@@ -183,6 +209,32 @@ class Numbers3 {
         }
         return $rounds;
     }
+
+    public function displayStaticsRoundsHitWithPlusoneNumber()
+    {
+        echo "連続した数字が出た回。".PHP_EOL;
+        $rounds = $this->getRoundsHitWithPlusoneNumber();
+
+        $this->displayResultMessages($rounds);
+    }
+    /*
+     * 123のような連続した数字が出た回を取得する。
+     * 
+     */
+    public function getRoundsHitWithPlusoneNumber()
+    {
+        $rounds = [];
+        foreach($this->data as $round => $item) {
+            $numbersArray = str_split($item['numbers']);
+            if ($numbersArray[0] + 1 == $numbersArray[1]
+            && $numbersArray[1] + 1 == $numbersArray[2]) {
+                $rounds[] = $round;
+            } else {
+                continue ;
+            }
+        }
+        return $rounds;
+    }
     private function getCondition($array, $type)
     {
         if ($type == 'allSame') {
@@ -202,14 +254,3 @@ class Numbers3 {
         }
     }
 }
-
-$numbers3 = new Numbers3();
-$numbers3->displayStaticsConsecutiveHit(2); // 0.12 
-$numbers3->displayStaticsConsecutiveDifferentCharOneNumbers(2); // 0.55
-$numbers3->displayStaticsRoundsHitWithInPreviousNumbers(1700); // 54.62
-$numbers3->displayStaticsRoundsHitWithSameNumber(); // 0.81%
-// 3桁の数字が連続 123, 456など
-// 両端の数字が同じ 121など
-// 前回数字と数字が一つだけ同じ 123→145とか
-// 前回数字とひっくり返した数字　123 → 321など
-// 
