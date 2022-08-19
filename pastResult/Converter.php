@@ -4,11 +4,13 @@ class Converter {
 
     private $sourceHtmlFilePath = "%s-past-result.html";
     private $convertedFilePath = "%s-past-result.json";
+    private $type;
 
     public function __construct($type)
     {
         $this->sourceHtmlFilePath = sprintf($this->sourceHtmlFilePath,$type);
         $this->convertedFilePath = sprintf($this->convertedFilePath,$type);
+        $this->type = $type;
     }
 
     public function convertHtmlToJson()
@@ -19,19 +21,35 @@ class Converter {
             echo "ファイルは空です";
             return ;
         }
+        $html = $this->replaceHtml($html);
 
         $resultNumbersList = $this->extractResultNumbers($html);
+        var_dump($resultNumbersList);
         file_put_contents($this->convertedFilePath, json_encode($resultNumbersList));
+        echo json_last_error_msg();
+    }
+    private function replaceHtml($html)
+    {
+        $html = str_replace(' ',' ',$html); //特殊スペースを半角スペースに
+        return str_replace(['  ', '  ', "\r\n", "\r", "\n", "\t"],'',$html);
     }
 
     private function extractResultNumbers($html)
     {
-        $roundPattern = '#<tr class=.*[\s\S]*?</tr>#';
-        preg_match_all($roundPattern,$html,$matches);
+        $roundsPattern = '#<tr class=.*?</tr>#';
+        preg_match_all($roundsPattern,$html,$matches);
 
-        $numberPattern = '#<td class="text-center text-bold">(\d{3,4})</td>#';
-        $datePattern = '#<td nowrap="nowrap" class="text-center">(\d{4}/\d{2}/\d{2})</td>#';
-        $roundPattern = '#<td nowrap="nowrap" class="text-center">(\d{4,5})</td>#';
+        if ($this->type == 'loto7'){
+            $numberPattern = '#<td class="text-center text-bold">(.*).{17}?</td>#'; //もっと綺麗に？
+            $bonusPattern = '#<td class="text-center text-bold">.{17}(.*)?</td>#';
+            $datePattern = '#<td nowrap="nowrap" class="text-center">(\d{4}/\d{2}/\d{2})?</td>#';
+            $roundPattern = '#<td nowrap="nowrap" class="text-center">第(\d{4})回?</td>#';
+        } else if ($this->type == 'numbers3') {
+            $numberPattern = '#<td class="text-center text-bold">(\d{3,4})</td>#';
+            $datePattern = '#<td nowrap="nowrap" class="text-center">(\d{4}/\d{2}/\d{2})</td>#';
+            $roundPattern = '#<td nowrap="nowrap" class="text-center">(\d{4,5})</td>#';
+        }
+
 
         $roundData = [];
         foreach($matches[0] as $match){
@@ -39,23 +57,39 @@ class Converter {
             $roundData[(int)$round] = [
                 'date' => $this->getStrings($datePattern,$match),
                 'numbers' => $this->getStrings($numberPattern,$match),
+                
             ];
+            if ($this->type == 'loto7') {
+                $roundData[(int)$round]['bonus'] =
+                 $this->getBonus($this->getStrings($bonusPattern,$match));
+            }
         }
-
+        //var_dump($roundData);
         ksort($roundData);
         return $roundData;
     }
 
     private function getStrings($pattern,$subject)
     {
+        if ($this->type == 'loto7'){
+            $subject = str_replace('<br>','/',$subject);
+        }
+        
         preg_match($pattern,$subject,$number);
         $result = $number[1];
         if ($result) {
-            return $result;
+            return mb_convert_encoding($result, 'UTF-8', 'UTF-8'); //マルチバイトエラー対応
         } else {
-            echo "空です".PHP_EOL;
+            echo $pattern.PHP_EOL;
+           // echo "空です".PHP_EOL;
             return "";
         }
+    }
+
+    private function getBonus($numbers)
+    {
+        preg_match("#\(.*\)#", $numbers, $matches);
+        return str_replace(['(',')'],'',$matches[0]);
     }
 }
 

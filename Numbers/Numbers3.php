@@ -3,11 +3,13 @@
 class Numbers3 {
     private $sourceFile = "../pastResult/numbers3-past-result.json";
     private $StaticsService;
+    private $PredictService;
 
     public function __construct()
     {
         $data = json_decode(file_get_contents($this->sourceFile),true);
         $this->StaticsService = new StaticsService($data);
+        $this->PredictService = new PredictService($data);
     }
 
     public function displayStatics()
@@ -18,10 +20,16 @@ class Numbers3 {
         $this->StaticsService->displayStaticsRoundsHitWithSameNumber(); // 0.81%
         $this->StaticsService->displayStaticsRoundsHitWithPlusoneNumber(); // 0.81%
     }
+
+    public function predict()
+    {
+        $this->PredictService->predict();
+    }
 }
 
 $numbers3 = new Numbers3();
 $numbers3->displayStatics();
+$numbers3->predict();
 // 3桁の数字が連続 123, 456など
 // 両端の数字が同じ 121など
 // 前回数字と数字が一つだけ同じ 123→145とか
@@ -66,7 +74,7 @@ class StaticsService {
      */
     public function displayStaticsConsecutiveDifferentCharOneNumbers($times)
     {
-        echo $times."回連続かつ±1,±10,±100の数字が出た回。".PHP_EOL;
+        echo $times."回連続かつ±1,±10,±100の数字が出た回。".PHP_EOL; //Numbers3に依存
         $rounds = $this->getConsecutiveDifferentCharOneNumbers(2);
         $this->displayResultMessages($rounds);
     }
@@ -85,7 +93,7 @@ class StaticsService {
 
             $array = [];
             for($i=0;$i<$times;$i++){
-                $array[] = $this->data[(int)$round+$i]['numbers'];
+                $array[] = $this->data[(int)$round+$i]['numbers']; // 2回しかないなら、もっと単純に。
             }
 
             if ($this->getCondition($array, 'differentOneNumber')) {
@@ -169,10 +177,7 @@ class StaticsService {
                 break;
             }
 
-            $array = [];
-            for($i=1;$i<=$previous;$i++){
-                $array[] = (int)$this->data[(int)$round+$i]['numbers'];
-            }
+            $array = $this->getNumbersRange($this->data, $round, $previous, 1);
 
             if (in_array($this->data[(int)$round]['numbers'],$array)) {
                 $rounds[] = $round;
@@ -183,17 +188,25 @@ class StaticsService {
         return $rounds;
     }
 
+    private function getNumbersRange($data, $start, $end, $step){
+        $array = [];
+        for($i=1;$i<=$end;$i++){
+            $array[] = (int)$this->data[(int)$start+$i*$step]['numbers'];
+        }
+        return $array;
+    }
+
 
     public function displayStaticsRoundsHitWithSameNumber()
     {
-        echo "3桁とも同じ数字が出た回。".PHP_EOL;
+        echo "全桁とも同じ数字が出た回。".PHP_EOL;
         $rounds = $this->getRoundsHitWithSameNumber();
 
         $this->displayResultMessages($rounds);
     }
 
     /*
-     * 3桁とも同じ数字が出た回を取得する。
+     * 全桁とも同じ数字が出た回を取得する。
      * 
      */
     public function getRoundsHitWithSameNumber()
@@ -227,7 +240,7 @@ class StaticsService {
         foreach($this->data as $round => $item) {
             $numbersArray = str_split($item['numbers']);
             if ($numbersArray[0] + 1 == $numbersArray[1]
-            && $numbersArray[1] + 1 == $numbersArray[2]) {
+            && $numbersArray[1] + 1 == $numbersArray[2]) { // Numbers3に依存
                 $rounds[] = $round;
             } else {
                 continue ;
@@ -252,5 +265,20 @@ class StaticsService {
                 in_array(abs($array[1] - $array[0]),[1,10,100]) 
             );
         }
+    }
+}
+class PredictService {
+    private $data;
+    
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
+    public function predict()
+    {
+        $data = $this->getPreviousNumberRange($data, $start, $end, $step);
+        $data = $this->filterSameNumber($data);
+        $data = $this->filterPlusOneNumber($data);
     }
 }
