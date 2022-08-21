@@ -1,20 +1,20 @@
 <?php
 
 class Numbers3 {
-    private $sourceFile = "../pastResult/numbers3-past-result.json";
+    private $numbersType = 3;
     private $NumbersPastData;
+    private $NumbersUtil;
     private $StaticsService;
     private $PredictService;
 
     public function __construct() {
-        $data = json_decode(file_get_contents($this->sourceFile), true);
-        $this->NumbersPastData = new NumbersPastData($data);
+        $this->NumbersPastData = new NumbersPastData();
         $this->StaticsService = new StaticsService($this->NumbersPastData->getData());
         // $this->PredictService = new PredictService();
     }
 
     public function displayStatics() {
-        $this->StaticsService->displayAllNumbersCount($this->NumbersPastData, 'asc', 20);
+        $this->StaticsService->displayAllResultNumbersCount($this->NumbersPastData, 'asc', 20);
     }
 
     public function predict() {
@@ -22,16 +22,41 @@ class Numbers3 {
     }
 }
 
+class NumbersUtil {
+
+    /*
+     *  全パターンを出力
+     */
+    public static function getAllNumbersPattern($numbersType) {
+        $result = [];
+        $max = str_repeat(9,$numbersType);
+        for ($i = 0; $i <= $max; $i++) {
+            $result[] = str_pad($i, $numbersType, '0', STR_PAD_LEFT);
+        }
+        return $result;
+    }
+
+    /*
+     *  Box当選かどうか
+     */
+    public static function isBoxHit($numbers1Array, $numbers2Array) {
+        sort($numbers1Array);
+        sort($numbers2Array);
+        return (implode($numbers1Array) == implode($numbers2Array));
+    }
+}
+
 class NumbersPastData {
+    private $sourceFile = "../pastResult/numbers3-past-result.json";
     private $numbersType = "";
     private $data = [];
 
-    public function __construct($data, $start = null, $end = null) {
+    public function __construct($start = null, $end = null) {
+        $data = json_decode(file_get_contents($this->sourceFile), true);
         $this->data = $this->createPastData($data, $start, $end);
     }
 
-    public function  getData()
-    {
+    public function  getData() {
         return $this->data;
     }
 
@@ -89,7 +114,7 @@ class StaticsService {
      *  @param $order 順序
      *  @param $limit 表示件数
      */
-    public function displayAllNumbersCount($order = 'desc', $limit = null) {
+    public function displayAllResultNumbersCount($order = 'desc', $limit = null) {
         $result = [];
         echo __METHOD__ . PHP_EOL;
         foreach ($this->data as $round => $numbers) {
