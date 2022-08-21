@@ -2,23 +2,42 @@
 
 class Numbers3 {
     private $sourceFile = "../pastResult/numbers3-past-result.json";
+    private $pastData;
     private $StaticsService;
     private $PredictService;
 
     public function __construct()
     {
+        $this->pastData = $this->createPastData();
+        $this->StaticsService = new StaticsService($this->pastData);
+        $this->PredictService = new PredictService($this->pastData);
+    }
+
+    /*
+     *  それぞれの桁に分ける
+     */
+    public function createPastData()
+    {
+        $result = [];
         $data = json_decode(file_get_contents($this->sourceFile),true);
-        $this->StaticsService = new StaticsService($data);
-        $this->PredictService = new PredictService($data);
+        foreach($data as $key => $item) {
+            $arr = str_split($item['numbers']);
+            $result[$key]['numbers'] = $arr;
+        }
+        return $result;
     }
 
     public function displayStatics()
     {
-        $this->StaticsService->displayStaticsConsecutiveHit(2); // 0.12 
-        $this->StaticsService->displayStaticsConsecutiveDifferentCharOneNumbers(2); // 0.55
-        $this->StaticsService->displayStaticsRoundsHitWithInPreviousNumbers(1700); // 54.62
-        $this->StaticsService->displayStaticsRoundsHitWithSameNumber(); // 0.81%
-        $this->StaticsService->displayStaticsRoundsHitWithPlusoneNumber(); // 0.81%
+        $this->StaticsService::displayAllNumbersCount($this->pastData, 'asc', 20);
+        $mini = $this->StaticsService::getAllNumbersMini($this->pastData);
+        $this->StaticsService::displayAllNumbersCount($mini, 'asc', 20);
+        //$this->StaticsService::displayAllNumbersMiniCount('asc', 20);
+        // $this->StaticsService->displayStaticsConsecutiveHit(2); // 0.12 
+        // $this->StaticsService->displayStaticsConsecutiveDifferentCharOneNumbers(2); // 0.55
+        // $this->StaticsService->displayStaticsRoundsHitWithInPreviousNumbers(1700); // 54.62
+        // $this->StaticsService->displayStaticsRoundsHitWithSameNumber(); // 0.81%
+        // $this->StaticsService->displayStaticsRoundsHitWithPlusoneNumber(); // 0.81%
     }
 
     public function predict()
@@ -36,20 +55,8 @@ $numbers3->predict();
 // 前回数字とひっくり返した数字　123 → 321など
 
 class StaticsService {
-    private $data;
     private $totalCount;
     private $showRounds = false;
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-        $this->totalCount = count($data);
-    }
-
-    public function getNumbersByRound($round)
-    {
-        return $this->data[$round];
-    }
 
     public function getRoundListByNumbers($numbers)
     {
@@ -61,6 +68,53 @@ class StaticsService {
         }
         return $result;
     }
+
+    /*
+     *  数字の出現回数
+     *  @param $order 順序
+     *  @param $limit 表示件数
+     */
+    public static function displayAllNumbersCount($data, $order = 'desc', $limit = null)
+    {
+        $result = [];
+        echo __METHOD__.PHP_EOL;
+        foreach($data as $round => $numbers) {
+            $key = '['.implode($numbers['numbers']).']';
+            if (!array_key_exists($key,$result)) {
+                $result[$key] = 1;
+            } else {
+                $result[$key] += 1;
+            }
+        }
+        if ($order == 'desc'){
+            asort($result);
+        } else {
+            arsort($result);
+        }
+
+        if (is_int($limit)) {
+            $result = array_chunk($result,$limit,true)[0];
+        }
+        foreach($result as $key => $item) {
+            echo "$key が $item 回".PHP_EOL;
+        }
+    }
+
+    /*
+     *  数字の出現回数
+     *  @param $order 順序
+     *  @param $limit 表示件数
+     */
+    public static function getAllNumbersMini($data)
+    {
+        foreach($data as $key => $item) {
+            $data[$key]['numbers'] = [
+                $item['numbers'][1],$item['numbers'][2]
+            ];
+        };
+        return $data;
+    }
+
 
     private function getProbabilityPerTotal($roundCount)
     {
@@ -277,8 +331,13 @@ class PredictService {
 
     public function predict()
     {
-        $data = $this->getPreviousNumberRange($data, $start, $end, $step);
-        $data = $this->filterSameNumber($data);
-        $data = $this->filterPlusOneNumber($data);
+        // $data = $this->getPreviousNumberRange($data, $start, $end, $step);
+        // $data = $this->filterSameNumber($data);
+        // $data = $this->filterPlusOneNumber($data);
+    }
+
+    private function filterSameNumbers()
+    {
+
     }
 }
