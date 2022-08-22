@@ -18,6 +18,7 @@ class Numbers {
     private $round = "";
     private $date = "";
     private $numbers = [];
+    private $mini = [];
 
     public function __construct($numbersType, $round, $date, $numbersString)
     {
@@ -27,7 +28,28 @@ class Numbers {
         $this->numbersType = $numbersType;
         $this->round = $round;
         $this->date = $date;
-        $this->numbers = str_split($numbersString);
+        $this->numbers = $this->createNumbersArray($numbersString);
+        
+        if ($numbersType == 3) {
+            $this->mini = [
+                '10digit' => $this->numbers['10digit'], 
+                '1digit' => $this->numbers['1digit']
+            ];
+        }
+    }
+
+    /*
+     *  数字を分割して、キーに桁をつける
+     */
+    private function createNumbersArray($numbersString)
+    {
+        $result = [];
+        $arr = str_split($numbersString);
+        foreach($arr as $key => $char) {
+            $key = "1".str_repeat(0,(count($arr)-$key-1))."digit";
+            $result[$key] = $char;
+        }
+        return $result;
     }
 
     public function getNumbersType()
@@ -50,6 +72,10 @@ class Numbers {
         return $this->numbers;
     }
 
+    public function getMini()
+    {
+        return $this->mini;
+    }
 
 }
 
@@ -105,22 +131,6 @@ class NumbersPastData {
         }
         return $result;
     }
-
-    /*
-     * ミニの取得
-     */
-    public function getAllNumbersMini() {
-        if ($this->numbersType !== 3) {
-            return [];
-        }
-
-        foreach ($this->data as $key => $item) {
-            $data[$key]['numbers'] = [
-                $item['numbers'][1], $item['numbers'][2]
-            ];
-        };
-        return $data;
-    }
 }
 
 class StaticsService {
@@ -172,5 +182,7 @@ class StaticsService {
 }
 
 $NumbersPastData = new NumbersPastData(3);
-$StaticsService = new StaticsService($NumbersPastData->getData());
-$StaticsService->displayAllResultNumbersCount($NumbersPastData->getData(),'a',null);
+$data = $NumbersPastData->getData();
+var_dump($data);
+//$StaticsService = new StaticsService($data);
+//$StaticsService->displayAllResultNumbersCount('a',null);
