@@ -4,8 +4,8 @@ class Prediction {
     private $NumbersPastData;
     private $StaticsService;
 
-    public function __construct() {
-        $this->StaticsService = new StaticsService($this->NumbersPastData->getData());
+    public function __construct($data) {
+        $this->NumbersPastData = new NumbersPastData(3);
     }
 
     public function predict() {
@@ -13,25 +13,44 @@ class Prediction {
     }
 }
 
-class Numbers { // メモリ足りない　配列を以下のようにする
-    // ['round' => 1111, 'date' => '2000/01/01', 'numbers' => [1,2,3]]
-    // private $numbersType = "";
-    // private $round = "";
-    // private $date = "";
-    // private $numbers = "";
-    // private $NumbersUtil;
+class Numbers {
+    private $numbersType = "";
+    private $round = "";
+    private $date = "";
+    private $numbers = [];
 
-    // public function __construct($round, $date, $numbersString)
-    // {
-    //     $this->round = $round;
-    //     $this->date = $date;
-    //     $this->numbersString = $numbersString;
-    // }
+    public function __construct($numbersType, $round, $date, $numbersString)
+    {
+        if ($numbersType != strlen($numbersString)) {
+            return null;
+        }
+        $this->numbersType = $numbersType;
+        $this->round = $round;
+        $this->date = $date;
+        $this->numbers = str_split($numbersString);
+    }
 
-    // public function getNumbers()
-    // {
-    //     return $this->getNumbers();
-    // }
+    public function getNumbersType()
+    {
+        return $this->numbersType;
+    }
+
+    public function getRound()
+    {
+        return $this->round;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function getNumbers()
+    {
+        return $this->numbers;
+    }
+
+
 }
 
 class NumbersUtil {
@@ -63,17 +82,18 @@ class NumbersPastData {
     private $numbersType = "";
     private $data = [];
 
-    public function __construct($start = null, $end = null) {
+    public function __construct($numbersType, $start = null, $end = null) {
+        $this->numbersType = $numbersType;
         $data = json_decode(file_get_contents($this->sourceFile), true);
         $this->data = $this->createPastData($data, $start, $end);
     }
 
-    public function  getData() {
+    public function getData() {
         return $this->data;
     }
 
     /*
-     *  それぞれの桁に分ける
+     *  過去データmodel作成
      */
     private function createPastData($data, $start, $end) {
         $result = [];
@@ -81,12 +101,8 @@ class NumbersPastData {
             $data = array_slice($data, $start, $end);
         }
         foreach ($data as $key => $item) {
-            $result[] = [
-                'round' => $key,
-                'date' => $item['date'],
-                'numbers' => str_split($item['numbers']),
-            ];
-        } 
+            $result[] = new Numbers(3, $key,$item['date'],$item['numbers']);
+        }
         return $result;
     }
 
@@ -105,23 +121,13 @@ class NumbersPastData {
         };
         return $data;
     }
-
-    public function getRoundListByNumbers($numbers) {
-        $result = [];
-        foreach ($this->data as $key => $item) {
-            if ($item['numbers'] == $numbers) {
-                $result[] = $key;
-            }
-        }
-        return $result;
-    }
 }
 
 class StaticsService {
     private $NumbersPastData = [];
 
-    public function __construct() {
-        $this->NumbersPastData = new NumbersPastData();
+    public function __construct($data) {
+        $this->NumbersPastData = $data;
     }
 
     /*
@@ -132,9 +138,8 @@ class StaticsService {
     public function displayAllResultNumbersCount($order = 'desc', $limit = null) {
         $result = [];
         echo __METHOD__ . PHP_EOL;
-        $data = $this->NumbersPastData->getData();
-        foreach ($data as $numbers) {
-            $key = '[' . implode($numbers['numbers']) . ']';
+        foreach ($this->NumbersPastData as $numbers) {
+            $key = '[' . implode($numbers->getNumbers()) . ']';
             if (!array_key_exists($key, $result)) {
                 $result[$key] = 1;
             } else {
@@ -154,7 +159,18 @@ class StaticsService {
             echo "$key が $item 回" . PHP_EOL;
         }
     }
+
+    public function getRoundListByNumbers($numbers) {
+        $result = [];
+        foreach ($this->NumbersPastData as $key => $item) {
+            if ($item['numbers'] == $numbers) {
+                $result[] = $key;
+            }
+        }
+        return $result;
+    }
 }
 
-$StaticsService = new StaticsService();
-$StaticsService->displayAllResultNumbersCount();
+$NumbersPastData = new NumbersPastData(3);
+$StaticsService = new StaticsService($NumbersPastData->getData());
+$StaticsService->displayAllResultNumbersCount($NumbersPastData->getData(),'a',null);
