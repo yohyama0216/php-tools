@@ -19,7 +19,7 @@ class Loto7 {
         //$this->StaticsService->displayStaticsRoundsHitWithInPreviousNumbers(5); // 54.62
         // $this->StaticsService->displayStaticsRoundsHitWithSameNumber(); // 0.81%
         // $this->StaticsService->displayStaticsRoundsHitWithPlusoneNumber(); // 0.81%
-        $this->StaticsService->getPreviousAllNumbers(5);
+        $this->StaticsService->getPreviousAllNumbers(2,5);
     }
 
     public function predict()
@@ -68,9 +68,9 @@ class StaticsService {
         return round($roundCount / $this->totalCount * 100, 2) ."%";
     }
 
-    public function getPreviousAllNumbers($previous)
+    public function getPreviousAllNumbers($start, $previous)
     {
-        $range = range(0,$previous-1);
+        $range = range($start,$start+$previous-1);
         $data = $this->data;
         rsort($data);
         foreach($range as $num) {

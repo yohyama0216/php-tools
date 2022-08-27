@@ -81,6 +81,14 @@ class Numbers {
 
 class NumbersUtil {
 
+    // 移植
+    public static $uraNumber4List = [
+        0 => 5,
+        1 => 6,
+        2 => 7,
+        3 => 8,
+        4 => 9,
+    ];
     /*
      *  全パターンを出力
      */
@@ -93,6 +101,19 @@ class NumbersUtil {
         return $result;
     }
 
+    /**
+     * 移植　BOXの全パターンを出す。
+     */
+    private function getAllBoxNumbersPattern() {
+        $result = [];
+        foreach($this->allNumbersStringList as $numbers) {
+            $number_array = str_split($numbers);
+            sort($number_array);
+            $result[] = implode($number_array);
+        }
+        return array_unique($result);
+    }
+
     /*
      *  Box当選かどうか
      */
@@ -100,6 +121,17 @@ class NumbersUtil {
         sort($numbers1Array);
         sort($numbers2Array);
         return (implode($numbers1Array) == implode($numbers2Array));
+    }
+
+    // 移植
+    private function hasHippariNumber($predict_number) {
+        $number_array = str_split($predict_number);
+        foreach($number_array as $number) {
+            if (strpos($this->beforeHitNumber,$number) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -170,6 +202,8 @@ class StaticsService {
         }
     }
 
+    //public function displayAllResultNumbersMiniCount($order = 'desc', $limit = null) {
+
     public function getRoundListByNumbers($numbers) {
         $result = [];
         foreach ($this->NumbersPastData as $key => $item) {
@@ -179,7 +213,77 @@ class StaticsService {
         }
         return $result;
     }
+
+    // 途中？
+    public function getFuushaGroup()
+    {
+        $num100array = [
+            0 => 'j',
+            1 => 'a',
+            2 => 'b',
+            3 => 'c',
+            4 => 'd',
+            5 => 'e',
+            6 => 'f',
+            7 => 'g',
+            8 => 'h',
+            9 => 'i',
+            ];
+        $num10array = [
+            0 => 'j',
+            7 => 'a',
+            4 => 'b',
+            1 => 'c',
+            8 => 'd',
+            5 => 'e',
+            2 => 'f',
+            9 => 'g',
+            6 => 'h',
+            3 => 'i',
+            ];
+        $num1array = [    0 => 'j',
+        9 => 'a',
+        8 => 'b',
+        7 => 'c',
+        6 => 'd',
+        5 => 'e',
+        4 => 'f',
+        3 => 'g',
+        2 => 'h',
+        1 => 'i',
+        ];   
+        
+        $result = [];
+        foreach($hit as $numbers) {
+            $num100 = $num100array[$numbers[0]];
+            $num10 = $num10array[$numbers[1]];
+            $num1 = $num1array[$numbers[2]];
+            $result[] = [$num100,$num10,$num1];
+            echo "$num100,$num10,$num1".PHP_EOL;
+        }
+    }
+
+    public function countNum10AndNum1Pair() {
+        $result = [
+            [],[],[],[],[],
+            [],[],[],[],[]
+        ];
+        foreach($this->hitRawNumbersList as $numbers) {
+            $mainKey = $numbers['num10'];
+            $subKey = $numbers['num10']."-".$numbers['num1'];
+            if (array_key_exists($subKey, $result[$mainKey]) == false) {
+                $result[$mainKey][$subKey] = 1;
+            } else {
+                $result[$mainKey][$subKey] += 1;
+            }
+        }
+        ksort($result);
+        
+        var_dump($result);
+        return $result;
+    }
 }
+
 
 $NumbersPastData = new NumbersPastData(3);
 $data = $NumbersPastData->getData();
