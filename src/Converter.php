@@ -1,19 +1,23 @@
 <?php
 
+namespace Test;
+
 class Converter {
 
-    private $sourceHtmlFilePath = "%s-past-result.html";
-    private $convertedFilePath = "%s-past-result.json";
+    private $sourceHtmlFilePath = "data/%s-past-result.html";
+    private $convertedFilePath = "data/%s-past-result.json";
     private $type;
 
     public function __construct($type)
     {
-        $this->sourceHtmlFilePath = sprintf($this->sourceHtmlFilePath,$type);
-        $this->convertedFilePath = sprintf($this->convertedFilePath,$type);
         $this->type = $type;
+        $this->sourceHtmlFilePath = sprintf($this->sourceHtmlFilePath,$this->type);
+        $this->convertedFilePath = sprintf($this->convertedFilePath,$this->type);
+        $this->resultDataList = $this->createResultDataList();
+
     }
 
-    public function convertHtmlToJson()
+    private function createResultDataList()
     {
         $html = file_get_contents($this->sourceHtmlFilePath);
 
@@ -23,18 +27,28 @@ class Converter {
         }
         $html = $this->replaceHtml($html);
 
-        $resultNumbersList = $this->extractResultNumbers($html);
-        var_dump($resultNumbersList);
-        file_put_contents($this->convertedFilePath, json_encode($resultNumbersList));
+        return $this->extractResultData($html);
+    }
+
+    public function generateResultJson()
+    {
+        file_put_contents($this->convertedFilePath, json_encode($this->resultNumbersList));
         echo json_last_error_msg();
     }
+
+    public function generateResultSQL()
+    {
+        return 'test';
+    }
+
+
     private function replaceHtml($html)
     {
         $html = str_replace(' ',' ',$html); //特殊スペースを半角スペースに
         return str_replace(['  ', '  ', "\r\n", "\r", "\n", "\t"],'',$html);
     }
 
-    private function extractResultNumbers($html)
+    private function extractResultData($html)
     {
         $roundsPattern = '#<tr class=.*?</tr>#';
         preg_match_all($roundsPattern,$html,$matches);
@@ -92,7 +106,3 @@ class Converter {
         return str_replace(['(',')'],'',$matches[0]);
     }
 }
-
-$type = $argv[1];
-$converter = new Converter($type);
-$converter->convertHtmlToJson();
