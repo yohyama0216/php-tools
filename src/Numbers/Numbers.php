@@ -1,6 +1,6 @@
 <?php
 
-
+namespace Test\Numbers;
 
 class Numbers {
     private $numbersType = '';
@@ -64,6 +64,11 @@ class Numbers {
     public function getMini()
     {
         return $this->mini;
+    }
+
+    public function toString()
+    {
+        return implode($this->numbers);
     }
 
 }

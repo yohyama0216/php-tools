@@ -4,6 +4,7 @@ namespace Test\Search;
 
 class Search {
     private $NumbersPastData = [];
+    private $searchResult = [];
 
     public function __construct($data) {
         $this->NumbersPastData = $data;
@@ -14,10 +15,15 @@ class Search {
      *  @param $order 順序
      *  @param $limit 表示件数
      */
-    public function displayAllResultNumbersCount($order = 'desc', $limit = null) {
+    public function searchAllNumbers()
+    {
+        $this->countNumbers($this->NumbersPastData);
+    }
+
+    private function countNumbers($data)
+    {
         $result = [];
-        echo __METHOD__ . PHP_EOL;
-        foreach ($this->NumbersPastData as $numbers) {
+        foreach ($data as $numbers) {
             $key = '[' . implode($numbers->getNumbers()) . ']';
             if (!array_key_exists($key, $result)) {
                 $result[$key] = 1;
@@ -25,19 +31,27 @@ class Search {
                 $result[$key] += 1;
             }
         }
-        if ($order == 'desc') {
-            asort($result);
-        } else {
-            arsort($result);
-        }
-
-        if (is_int($limit)) {
-            $result = array_chunk($result, $limit, true)[0];
-        }
-        foreach ($result as $key => $item) {
-            echo "$key が $item 回" . PHP_EOL;
-        }
+        $this->searchResult = $result;
     }
+
+    /*
+     * 全桁とも同じ数字が出た回を取得する。
+     */
+    public function searchSameDigitNumbers()
+    {
+        $result = [];
+        foreach($this->NumbersPastData as $round => $item) {
+            $numbersArray = $item->getNumbers();
+            if (count(array_unique($numbersArray)) == 1) {
+                $numbersString = $item->toString();
+                $result[$numbersString] = $round;
+            } else {
+                continue ;
+            }
+        }
+        $this->searchResult = $result;
+    }
+
 
     //public function displayAllResultNumbersMiniCount($order = 'desc', $limit = null) {
 
@@ -118,5 +132,25 @@ class Search {
         
         var_dump($result);
         return $result;
+    }
+
+
+
+
+    public function displayResult($order = 'desc', $limit=null)
+    {
+        $result = $this->searchResult;
+        if ($order == 'desc') {
+            asort($result);
+        } else {
+            arsort($result);
+        }
+
+        if (is_int($limit)) {
+            $result = array_chunk($result, $limit, true)[0];
+        }
+        foreach ($result as $key => $item) {
+            echo "$key が $item 回" . PHP_EOL;
+        }
     }
 }

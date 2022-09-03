@@ -2,10 +2,8 @@
 
 namespace Test\Numbers;
 
-use Numbers;
-
 class NumbersPastData {
-    private $sourceFile = "../pastResult/numbers3-past-result.json";
+    private $sourceFile = "./data/numbers3-past-result.json";
     private $numbersType = "";
     private $data = [];
 

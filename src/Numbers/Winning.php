@@ -2,8 +2,6 @@
 
 namespace Test\Numbers;
 
-use Numbers;
-
 class Winning {
     /*
      *  Box当選かどうか
