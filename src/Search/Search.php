@@ -20,6 +20,19 @@ class Search {
         $this->countNumbers($this->NumbersPastData);
     }
 
+    /*
+     * 全桁とも同じ数字が出た回数
+     */
+    public function searchSameDigitNumbers()
+    {
+        $result = array_filter($this->NumbersPastData,function($v) {
+            $numbersArray = $v->getNumbers();
+            return (count(array_unique($numbersArray)) == 1);
+        },ARRAY_FILTER_USE_BOTH);
+        $this->countNumbers($result);
+    }
+
+
     private function countNumbers($data)
     {
         $result = [];
@@ -34,23 +47,6 @@ class Search {
         $this->searchResult = $result;
     }
 
-    /*
-     * 全桁とも同じ数字が出た回を取得する。
-     */
-    public function searchSameDigitNumbers()
-    {
-        $result = [];
-        foreach($this->NumbersPastData as $round => $item) {
-            $numbersArray = $item->getNumbers();
-            if (count(array_unique($numbersArray)) == 1) {
-                $numbersString = $item->toString();
-                $result[$numbersString] = $round;
-            } else {
-                continue ;
-            }
-        }
-        $this->searchResult = $result;
-    }
 
 
     //public function displayAllResultNumbersMiniCount($order = 'desc', $limit = null) {
