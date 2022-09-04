@@ -7,6 +7,8 @@ class Numbers {
     private $round = "";
     private $date = "";
     private $numbers = [];
+    private $numbersString = '';
+    private $uraNumbers = [];
     private $mini = [];
 
     public function __construct($numbersType, $round, $date, $numbersString)
@@ -17,7 +19,9 @@ class Numbers {
         $this->numbersType = $numbersType;
         $this->round = $round;
         $this->date = $date;
+        $this->numbersString = $numbersString;
         $this->numbers = $this->createNumbersArray($numbersString);
+        $this->uraNumbers = $this->setUraNumbers($numbersString);
         
         if ($numbersType == 3) {
             $this->mini = [
@@ -61,14 +65,19 @@ class Numbers {
         return $this->numbers;
     }
 
+    public function getUraNumbers()
+    {
+        return $this->numbers;
+    }
+
     public function getMini()
     {
         return $this->mini;
     }
 
-    public function toString()
+    public function getNumbersString()
     {
-        return implode($this->numbers);
+        return $this->numbersString;
     }
 
     public function isSameDigit()
@@ -106,19 +115,18 @@ class Numbers {
         }
     }
 
+    private function setUraNumbers()
+    {
+        foreach($this->numbers as $value){
+            $this->uraNumbers[] = Windmill::getUraNumber($value);
+        }
+    }
 }
 
 // ?? 意味ある？
 class NumbersUtil {
 
-    // 移植
-    public static $uraNumber4List = [
-        0 => 5,
-        1 => 6,
-        2 => 7,
-        3 => 8,
-        4 => 9,
-    ];
+
     /*
      *  全パターンを出力
      */
@@ -143,8 +151,4 @@ class NumbersUtil {
         }
         return array_unique($result);
     }
-
-
-
-
 }

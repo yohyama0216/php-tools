@@ -47,7 +47,6 @@ class Search {
         $this->searchResult = $result;
     }
 
-
     /**
      * 鏡数字が出るケース
      */
@@ -58,6 +57,28 @@ class Search {
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
     }
+
+    /**
+     * 2回連続で同じ数字が出るケース
+     */
+    public function searchSameNumberTimes()
+    {
+        $result = array_filter($this->NumbersPastData,function($v,$k) {
+            echo $k.":".$v->getNumbersString();
+            if ($k > 1){
+                $currentNumbers = $v->getNumbers();
+                $prevNumbers = $this->NumbersPastData[$k-1]->getNumbers();
+                $condition = $currentNumbers == $prevNumbers;
+                if ($condition) {
+                   echo "-".$v->getRound();
+                }
+                echo PHP_EOL;
+                return $condition ;
+            }
+
+        },ARRAY_FILTER_USE_BOTH);
+        $this->searchResult = $result;
+    }    
     /**
      * 過去5回に同じ数字が出るケース
      */
@@ -94,54 +115,6 @@ class Search {
         return $result;
     }
 
-    // 途中？
-    public function getFuushaGroup()
-    {
-        $num100array = [
-            0 => 'j',
-            1 => 'a',
-            2 => 'b',
-            3 => 'c',
-            4 => 'd',
-            5 => 'e',
-            6 => 'f',
-            7 => 'g',
-            8 => 'h',
-            9 => 'i',
-            ];
-        $num10array = [
-            0 => 'j',
-            7 => 'a',
-            4 => 'b',
-            1 => 'c',
-            8 => 'd',
-            5 => 'e',
-            2 => 'f',
-            9 => 'g',
-            6 => 'h',
-            3 => 'i',
-            ];
-        $num1array = [    0 => 'j',
-        9 => 'a',
-        8 => 'b',
-        7 => 'c',
-        6 => 'd',
-        5 => 'e',
-        4 => 'f',
-        3 => 'g',
-        2 => 'h',
-        1 => 'i',
-        ];   
-        
-        $result = [];
-        foreach($hit as $numbers) {
-            $num100 = $num100array[$numbers[0]];
-            $num10 = $num10array[$numbers[1]];
-            $num1 = $num1array[$numbers[2]];
-            $result[] = [$num100,$num10,$num1];
-            echo "$num100,$num10,$num1".PHP_EOL;
-        }
-    }
 
     public function countNum10AndNum1Pair() {
         $result = [
