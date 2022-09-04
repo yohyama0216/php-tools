@@ -8,9 +8,9 @@ require('vendor/autoload.php');
 //$html = $Converter->generateResultSQL();
 
 $NumbersPastData = new NumbersPastData(3);
-$data = $NumbersPastData->getData();
-$Search = new Test\Search\Search($data);
-$Search->searchSameDigitNumbers();
+//$data = $NumbersPastData->getData();
+$Search = new Test\Search\Search($NumbersPastData);
+$Search->searchNumbersDigitPattern(10,2,'1digit');
 $Search->displayResult();
 
 ?>

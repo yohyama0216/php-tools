@@ -44,8 +44,22 @@ class NumbersPastData extends ArrayObject {
         $currentNumber = $this->data[$index]->getNumbersString();
         $range = range(1,$times);
         foreach ($range as $num) {
-            $pastNumbers[] = $this->data[$index-$times]->getNumbersString();
+            $pastNumbers[] = $this->data[$index-$num]->getNumbersString();
         }
         return in_array($currentNumber,$pastNumbers);
+    }
+
+    public function getPatternWithinPrevs($index,$times,$step,$digit)
+    {
+        if ($index < $times*$step) {
+            return false;
+        }
+        
+        $numbersPattern = [];
+        $range = range(0,$times*$step, $step);
+        foreach ($range as $num) {
+            $numbersPattern[] = $this->data[$index-$num]->getNumbers()[$digit];
+        }
+        return implode('->',$numbersPattern).PHP_EOL;
     }
 }

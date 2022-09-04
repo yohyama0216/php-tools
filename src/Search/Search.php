@@ -68,25 +68,20 @@ class Search {
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
     } 
-    // 移植
-    public function hasHippariNumber($predict_number) {
-        $result = array_filter($this->NumbersPastData,function($v,$k) {
-            echo $k.":".$v->getNumbersString();
-            if ($k > 5){
-                $currentNumbers = $v->getNumbers();
-                $prev1 = $this->NumbersPastData[$k-1]->getNumbers();
 
-                
-                if ($condition) {
-                   echo "-".$v->getRound();
-                }
-                echo PHP_EOL;
-                return $condition ;
-            }
-
+    /**
+     * 過去に出た数字をパターン化
+     * $step=1 だと連続。 $step=2だと1個飛ばし
+     */
+    public function searchNumbersDigitPattern($prevs,$step,$digit)
+    {
+        $result = array_filter($this->NumbersPastData->getData(),function($v,$k) use ($prevs,$step,$digit) {
+            echo $this->NumbersPastData->getPatternWithinPrevs($k,$prevs,$step,$digit);
+            return ;
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
-    }
+    } 
+
 
     private function countNumbers($data)
     {
