@@ -71,6 +71,41 @@ class Numbers {
         return implode($this->numbers);
     }
 
+    public function isSameDigit()
+    {
+        return count(array_unique($this->numbers)) == 1;
+    }
+
+    public function isStep()
+    {
+        $numbers = $this->numbers;
+        if ($this->numbersType == 3) {
+            return (
+                ($numbers['1digit'] == $numbers['10digit'] + 1)
+            &&  ($numbers['10digit'] == $numbers['100digit'] + 1)           
+            );
+        } else if ($this->numbersType == 4) {
+            return (
+                ($numbers['1digit'] == $numbers['10digit'] + 1)
+            &&  ($numbers['10digit'] == $numbers['100digit'] + 1)
+            &&  ($numbers['100digit'] == $numbers['1000digit'] + 1)          
+            );
+        }
+    }
+
+    public function isMirror()
+    {
+        $numbers = $this->numbers;
+        if ($this->numbersType == 3) {
+            return ($numbers['1digit'] == $numbers['100digit']);
+        } else if ($this->numbersType == 4) {
+            return (
+                ($numbers['1digit'] == $numbers['1000digit'])
+            &&  ($numbers['10digit'] == $numbers['100digit'])       
+            );
+        }
+    }
+
 }
 
 // ?? 意味ある？

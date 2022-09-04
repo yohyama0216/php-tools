@@ -17,7 +17,7 @@ class Search {
      */
     public function searchAllNumbers()
     {
-        $this->countNumbers($this->NumbersPastData);
+        $this->searchResult = $this->NumbersPastData;
     }
 
     /*
@@ -26,12 +26,45 @@ class Search {
     public function searchSameDigitNumbers()
     {
         $result = array_filter($this->NumbersPastData,function($v) {
-            $numbersArray = $v->getNumbers();
-            return (count(array_unique($numbersArray)) == 1);
+            return $v->isSameDigit();
         },ARRAY_FILTER_USE_BOTH);
-        $this->countNumbers($result);
+        $this->searchResult = $result;
     }
 
+    /**
+     * 前回と同じ数字が出るケース
+     */
+
+
+    /**
+     * 階段数字が出るケース
+     */
+    public function searchStepNumbers()
+    {
+        $result = array_filter($this->NumbersPastData,function($v) {
+            return $v->isStep();
+        },ARRAY_FILTER_USE_BOTH);
+        $this->searchResult = $result;
+    }
+
+
+    /**
+     * 鏡数字が出るケース
+     */
+    public function searchMirrorNumbers()
+    {
+        $result = array_filter($this->NumbersPastData,function($v) {
+            return $v->isMirror();
+        },ARRAY_FILTER_USE_BOTH);
+        $this->searchResult = $result;
+    }
+    /**
+     * 過去5回に同じ数字が出るケース
+     */
+
+    /**
+     * 
+     */
 
     private function countNumbers($data)
     {
@@ -44,7 +77,7 @@ class Search {
                 $result[$key] += 1;
             }
         }
-        $this->searchResult = $result;
+        return $result;
     }
 
 
@@ -135,7 +168,7 @@ class Search {
 
     public function displayResult($order = 'desc', $limit=null)
     {
-        $result = $this->searchResult;
+        $result = $this->countNumbers($this->searchResult);
         if ($order == 'desc') {
             asort($result);
         } else {
