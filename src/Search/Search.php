@@ -17,7 +17,7 @@ class Search {
      */
     public function searchAllNumbers()
     {
-        $this->searchResult = $this->NumbersPastData;
+        $this->searchResult = $this->NumbersPastData->getData();
     }
 
     /*
@@ -25,7 +25,7 @@ class Search {
      */
     public function searchSameDigitNumbers()
     {
-        $result = array_filter($this->NumbersPastData,function($v) {
+        $result = array_filter($this->NumbersPastData->getData(),function($v) {
             return $v->isSameDigit();
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
@@ -41,7 +41,7 @@ class Search {
      */
     public function searchStepNumbers()
     {
-        $result = array_filter($this->NumbersPastData,function($v) {
+        $result = array_filter($this->NumbersPastData->getData(),function($v) {
             return $v->isStep();
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
@@ -52,23 +52,31 @@ class Search {
      */
     public function searchMirrorNumbers()
     {
-        $result = array_filter($this->NumbersPastData,function($v) {
+        $result = array_filter($this->NumbersPastData->getData(),function($v) {
             return $v->isMirror();
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
     }
-
+ 
     /**
-     * 2回連続で同じ数字が出るケース
+     * 過去n回に同じ数字が出るケース
      */
-    public function searchSameNumberTimes()
+    public function searchSameNumberWithin($prevs)
     {
+        $result = array_filter($this->NumbersPastData->getData(),function($v,$k) use ($prevs) {
+            return $this->NumbersPastData->inPrevNumbers($k, $prevs);
+        },ARRAY_FILTER_USE_BOTH);
+        $this->searchResult = $result;
+    } 
+    // 移植
+    public function hasHippariNumber($predict_number) {
         $result = array_filter($this->NumbersPastData,function($v,$k) {
             echo $k.":".$v->getNumbersString();
-            if ($k > 1){
+            if ($k > 5){
                 $currentNumbers = $v->getNumbers();
-                $prevNumbers = $this->NumbersPastData[$k-1]->getNumbers();
-                $condition = $currentNumbers == $prevNumbers;
+                $prev1 = $this->NumbersPastData[$k-1]->getNumbers();
+
+                
                 if ($condition) {
                    echo "-".$v->getRound();
                 }
@@ -78,14 +86,7 @@ class Search {
 
         },ARRAY_FILTER_USE_BOTH);
         $this->searchResult = $result;
-    }    
-    /**
-     * 過去5回に同じ数字が出るケース
-     */
-
-    /**
-     * 
-     */
+    }
 
     private function countNumbers($data)
     {

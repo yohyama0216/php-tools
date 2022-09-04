@@ -14,14 +14,5 @@ class Winning {
         return (implode($numbers1Array) == implode($numbers2Array));
     }
 
-    // 移植
-    private function hasHippariNumber($predict_number) {
-        $number_array = str_split($predict_number);
-        foreach($number_array as $number) {
-            if (strpos($this->beforeHitNumber,$number) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

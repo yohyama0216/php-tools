@@ -2,7 +2,9 @@
 
 namespace Test\Numbers;
 
-class NumbersPastData {
+use ArrayObject;
+
+class NumbersPastData extends ArrayObject {
     private $sourceFile = "./data/numbers3-past-result.json";
     private $numbersType = "";
     private $data = [];
@@ -29,5 +31,21 @@ class NumbersPastData {
             $result[] = new Numbers(3, $key,$item['date'],$item['numbers']);
         }
         return $result;
+    }
+
+    // n回以内に今の数字と同じ数字が存在しているか
+    public function inPrevNumbers($index,$times)
+    {
+        if ($index < $times) {
+            return false;
+        }
+        
+        $pastNumbers = [];
+        $currentNumber = $this->data[$index]->getNumbersString();
+        $range = range(1,$times);
+        foreach ($range as $num) {
+            $pastNumbers[] = $this->data[$index-$times]->getNumbersString();
+        }
+        return in_array($currentNumber,$pastNumbers);
     }
 }
