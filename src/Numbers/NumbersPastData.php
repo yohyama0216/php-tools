@@ -49,6 +49,22 @@ class NumbersPastData extends ArrayObject {
         return in_array($currentNumber,$pastNumbers);
     }
 
+    // 途中
+    public function hasHippariNumber($predict_number) {
+        $result = array_filter($this->NumbersPastData->getData(),function($v,$k) {
+            $prevNumbers = $this->NumbersPastData->getData()[$k-1];
+            $hasHippari = false;
+            foreach($v->getNumbers() as $number) {
+                if (in_array($number, $prevNumbers)) {
+                    $hasHippari = true;
+                }
+            }
+            return $hasHippari;
+
+        },ARRAY_FILTER_USE_BOTH);
+        $this->searchResult = $result;
+    }
+
     public function getPatternWithinPrevs($index,$times,$step,$digit)
     {
         if ($index < $times*$step) {
