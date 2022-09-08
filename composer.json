@@ -3,5 +3,8 @@
         "psr-4": {
             "Test\\": "src"
         }
+    },
+    "require": {
+        "chillerlan/php-qrcode": "^4.3"
     }
 }
