@@ -33,7 +33,7 @@ class Scraper
     {
         $html = file_get_contents($url);
         preg_match_all($pattern, $html, $matches);
-        return $matches[0];
+        return $matches[1]; // 切り替える？
     }
 
     public function createResultJson()

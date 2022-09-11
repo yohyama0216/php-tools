@@ -1,6 +1,6 @@
 <?php
 
-class ScrapingCondition
+class StatsRoyaleCondition
 {
     private $baseUrl = "http://statsroyale.com/ja/decks/challenge-winners?type=top200&page=%s";
     private $range = [];
