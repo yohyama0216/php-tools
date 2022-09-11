@@ -41,10 +41,10 @@ class Compare
                 '期間収益/発注' => round($pl / $minimum,2),
                 '推奨/発注<br/>（変動性）' => $bolatility,
                 '仮シャープレシオ<br/>（期間収益率/変動性）' => $sharpe,
-                'シャープ/推奨<br/>（手軽さ）' => $convenient,
+                //'シャープ/推奨<br/>（手軽さ）' => $convenient,
             ];   
         }
-        $key = 'シャープ/推奨<br/>（手軽さ）';
+        $key = '仮シャープレシオ<br/>（期間収益率/変動性）';
         $this->sortByKey($data,$key);
         return $data;
     }
@@ -64,9 +64,9 @@ class Compare
         echo '<html><body><table style="border: 1px solid black;"><tbody style="border: 1px solid black;">';
         echo '<tr><th>'.$this->getHeader().'</th><tr>'.PHP_EOL;
         foreach($this->data as $item) {
-            echo '<tr style="border: 1px solid black;">';
+            echo '<tr>';
             foreach($item as $key => $value){
-                echo '<td>'.$value.'</td>';
+                    echo '<td>'.$value.'</td>';
             }
             echo '<tr>'.PHP_EOL;
             // echo '<tr style="border: 1px solid black;"><td>'
