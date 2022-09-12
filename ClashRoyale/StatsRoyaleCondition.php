@@ -12,8 +12,13 @@ class StatsRoyaleCondition
 
     public function __construct()
     {
-        $this->range = range(1,2);
+        $this->range = range(3,5);
         $this->targetUrlList = $this->createTargetUrlList();
+    }
+
+    public function getRangeStart()
+    {
+        return $this->range[0];
     }
 
     public function getTargetUrlList()
@@ -29,14 +34,12 @@ class StatsRoyaleCondition
     private function createTargetUrlList()
     {
         $result = [];
-        $pageUrlList = [];
         foreach($this->range as $num) {
-            $pageKey = 'page'.$num;
-            $pageUrlList[$pageKey] = sprintf($this->baseUrl,$num);
-        }
-
-        foreach($pageUrlList as $key => $pageUrl) {
-            $result[$key] = $this->getTargetUrl($pageUrl);
+            $pageUrl = sprintf($this->baseUrl,$num);
+            $targetUrlList = $this->getTargetUrl($pageUrl);
+            foreach($targetUrlList as $targetUrl) {
+                $result[] = $targetUrl;
+            }
         }
         return $result;
     }    
@@ -45,7 +48,7 @@ class StatsRoyaleCondition
     {
         $html = file_get_contents($pageUrl);
         $pattern = '#<a href="(.*)?" class="recentWinners__footerAction ui__layoutOneLine ui__link">#';
-        preg_match($pattern, $html, $matches);
+        preg_match_all($pattern, $html, $matches);
         return $matches[1];
     }
 }
