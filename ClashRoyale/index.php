@@ -2,8 +2,9 @@
 
 require('./StatsRoyaleCondition.php');
 require('./Scraper.php');
-
-$StatsRoyaleCondition = new StatsRoyaleCondition();
+$start = $argv[1];
+$end = $argv[2];
+$StatsRoyaleCondition = new StatsRoyaleCondition($start,$end);
 $StatsRoyaleCondition->getTargetUrlList();
 $Scraper = new Scraper($StatsRoyaleCondition);
 $Scraper->execute();

@@ -10,9 +10,9 @@ class StatsRoyaleCondition
         'deckCopyUrl' => '#https://link.clashroyale.com/deck/.*deck=\d{8};\d{8};\d{8};\d{8};\d{8};\d{8};\d{8};\d{8}#',
     ];
 
-    public function __construct()
+    public function __construct($start,$end)
     {
-        $this->range = range(3,5);
+        $this->range = range($start,$end);
         $this->targetUrlList = $this->createTargetUrlList();
     }
 

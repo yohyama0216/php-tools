@@ -3,7 +3,7 @@
 class Scraper
 {
     private $number = 0;
-    private $fileName = './result%d.json';
+    private $fileName = './result/result%d.json';
     private $StatsRoyaleCondition = null;
     private $resultList = [];
 
