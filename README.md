@@ -1,21 +1,30 @@
 # PHPTools
-## 機能
-### ナンバーズ、ロト予想ツール
-* 実装途中
-* 基本的には過去のデータから数字のパターンをカウントし、予想する。
 
+## 作成予定
+* WordPress Plugin
+* PHPUnit
 
-### QRCode作成ツール
-* サンプルコードをそのまま実際にやってみただけ
+## 作成したもの
+* 趣味用
+    * ClashRoyale
+        * とあるサイトの動画URLの全取得をするツール
+            * 動作が遅くて休止
+    * MovieGetterTool
+        * YouTubeのPlaylistの動画を全部取得する
 
-### その他やること
-#### PHPUnit
-* 一から設定したことが無かったのでやってみる
+* 技術検証
+    * GlobalIP
+    * PHPSpreadsheet
+    * QRCode
 
-#### Laravel 導入
+* コーディング
+    * yumemi
+        * ゆめみからの挑戦状の回答
 
-#### WordPress プラグイン開発
-
+## WIP
+* NumbersLotoPredictionTool
+    * ナンバーズとロトの予想ツール
+* 
 
 
 
