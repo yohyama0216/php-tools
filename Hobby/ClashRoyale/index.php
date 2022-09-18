@@ -13,4 +13,4 @@ $StatsRoyaleCondition->getTargetUrlList();
 $Scraper = new Scraper($StatsRoyaleCondition);
 $Scraper->execute();
 var_dump($Scraper->getResultList());
-// $Scraper->createResultJson();
+$Scraper->createResultJson();

@@ -28,7 +28,9 @@ class Scraper
             foreach($targetPatternList as $target => $pattern) {
 
                 $data[$target] = $this->scrape($url, $pattern);
-
+            }
+            if (empty($data['movieUrl']) || empty($data)) {
+                continue ;
             }
             $this->resultList[] = $data;
             $this->createResultJson();
@@ -44,6 +46,8 @@ class Scraper
     {
         $ch = curl_init(); // はじめ
 
+        //Guzzleでやってみる
+
         //オプション
         curl_setopt($ch, CURLOPT_URL, $url); 
         //curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17');
@@ -53,9 +57,14 @@ class Scraper
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $html = curl_exec($ch);
         $this->getNow();
-        preg_match_all($pattern, $html, $matches);
+        if (strpos($html,'26000004;') == false
+        || strpos($html,'26000036;') == false) {
+            curl_close($ch); //終了
+            return [];
+        }
         $this->getNow();
         curl_close($ch); //終了
+        preg_match_all($pattern, $html, $matches);
         return $matches[0];
     }
 
@@ -63,7 +72,7 @@ class Scraper
     private function createResultJson()
     {
         echo count($this->resultList).PHP_EOL;
-        if (count($this->resultList) % 9 == 0) {
+        if (!empty($this->result) && count($this->resultList) % 3 == 0) {
             $fileName = sprintf($this->fileName,$this->number); 
             file_put_contents($fileName,json_encode($this->resultList));
             echo "$fileName created".PHP_EOL;
